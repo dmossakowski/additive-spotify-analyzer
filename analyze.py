@@ -56,6 +56,10 @@ def getTopGenreSet(library):
     genres = []
     cnt = Counter()
 
+    if library is None:
+        return genres
+
+
     for track in library['topartists']:
         genres.extend(track.get('genres'))
 
