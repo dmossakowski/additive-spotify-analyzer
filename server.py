@@ -3,7 +3,7 @@ import io
 import urllib
 from functools import wraps
 
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 from flask import Flask, redirect, url_for, session, request, render_template, send_file, jsonify, Response, stream_with_context
 #from flask_oauthlib.client import OAuth, OAuthException
 from authlib.integrations.flask_client import OAuth
@@ -21,7 +21,7 @@ import time
 import datetime
 from threading import Thread
 
-load_dotenv()
+#load_dotenv()
 # https://docs.authlib.org/en/latest/flask/2/index.html#flask-oauth2-server
 # If you are developing on your localhost, remember to set the environment variable:
 # export AUTHLIB_INSECURE_TRANSPORT=true
