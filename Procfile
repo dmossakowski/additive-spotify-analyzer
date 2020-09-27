@@ -1,1 +1,1 @@
-web: gunicorn app:additive-spotify-analyzer
+web: gunicorn app: server.py
