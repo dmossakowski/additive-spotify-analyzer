@@ -47,7 +47,7 @@ def getLibrarySize(library):
     if library.get('toptracks'):
             s = s + ', Top tracks: ' + str(len(library.get('toptracks')))
     if library.get('topartists'):
-            s = s + ', Top tracks: ' + str(len(library.get('topartists')))
+            s = s + ', Top artists: ' + str(len(library.get('topartists')))
 
     return s
 

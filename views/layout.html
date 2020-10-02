@@ -73,14 +73,17 @@
 	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
 
+
 <script>
 //https://stackoverflow.com/questions/9933619/html5-eventsource-listener-for-all-events
 
 		var eventSource = new EventSource("/progress");
+		var lastUpdate = ' ';
 		eventSource.onmessage = function(e) {
 			var targetContainer = document.getElementById('progressMessages');
     		//targetContainer.innerHTML = "<pre>"+e.data+"</pre>";
     		targetContainer.innerHTML = e.data;
+    		lastUpdate = e.data;
 
     		console.log('progress '+e.data+' '+e.msg)
     		console.log(e)
@@ -95,6 +98,11 @@
 
 
 		function retrieveData() {
+		var targetContainer = document.getElementById('progressMessages');
+    		//targetContainer.innerHTML = "<pre>"+e.data+"</pre>";
+    		targetContainer.innerHTML = " Loading... ";
+
+    		console.log('Loading... ')
       $.ajax({
            type: "GET",
            url: '/datadownload',
@@ -110,6 +118,9 @@
 
 	</head>
 	<body>
+
+
+
 		<div id="fh5co-wrapper">
 		<div id="fh5co-page">
 
@@ -124,11 +135,10 @@
 
 						{% if username is defined %}
 
-
-
-
 							<!--li><a href="/progresstest">Progress</a></li-->
 							<li><a href="#" onClick="retrieveData()">Update data</a></li>
+
+							<li><a class="popup-modal" href="#test-modal">Open modal</a></li>
 							<li>
 								<a href="/analyze" class="fh5co-sub-ddown">Analysis</a>
 								<ul class="fh5co-sub-menu">
