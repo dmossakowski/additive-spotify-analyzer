@@ -4,7 +4,8 @@ import urllib
 from functools import wraps
 
 from dotenv import load_dotenv
-from flask import Flask, redirect, url_for, session, request, render_template, send_file, jsonify, Response, stream_with_context
+from flask import Flask, redirect, url_for, session, request, render_template, send_file, jsonify, Response, \
+    stream_with_context, copy_current_request_context
 #from flask_oauthlib.client import OAuth, OAuthException
 from authlib.integrations.flask_client import OAuth
 from authlib.integrations.flask_client import OAuthError
@@ -19,7 +20,7 @@ import os
 import traceback
 import time
 import datetime
-from threading import Thread
+import threading
 
 load_dotenv()
 # https://docs.authlib.org/en/latest/flask/2/index.html#flask-oauth2-server
@@ -46,6 +47,19 @@ session_dataLoadingProgressMsg = 'dataLoadingProgressMsg'
 gdata = {}
 templateArgs = {}
 
+class ExportingThread(threading.Thread):
+    def __init__(self):
+        self.progress = 0
+        super().__init__()
+
+    def run(self):
+        # Your exporting stuff goes here ...
+        with app.app_context():
+            _retrieveSpotifyData()
+
+
+
+exporting_threads = {}
 
 def login_required(fn):
     @wraps(fn)
@@ -135,7 +149,7 @@ def index():
 
 @app.route('/login')
 def login():
-    print ("doing login",str(request.referrer))
+    print ("doing login",str(request.referrer)," client_id",str(SPOTIFY_APP_ID))
 
     callback = url_for('spotify_authorized', _external=True)
 
@@ -153,7 +167,7 @@ def login():
 @app.route('/revoke')
 def revoke():
     print ("doing revoke")
-    spotify.revoke()
+    #spotify.revoke()
 
 
 @app.route('/logout')
@@ -276,14 +290,37 @@ def refreshToken():
 @app.route('/datadownload')
 @login_required
 def downloadData():
-    library = _retrieveSpotifyData()
+    library = _retrieveSpotifyData(session)
+    print(" datadownload")
 
+    @copy_current_request_context
+    def handle_sub_view(session):
+        with app.test_request_context():
+            from flask import request
+            print(" starting new thread"+session.get('username'))
+            #request = req
+            print(request.url)
+            # Do Expensive work
+            _retrieveSpotifyData(session)
 
+    #threading.Thread(target=handle_sub_view, args=(session,)).start()
 
-    return render_template('index.html', sortedA=library.get('playlists'),
-                           subheader_message="Playlists retrieved with track count "+str(len(library['tracks'])),
-                           library=library,
-                            **session)
+    #with app.app_context():
+    #
+    #    global exporting_threads#
+
+        #thread_id = random.randint(0, 10000)
+    #    thread_id =1
+    #    exporting_threads[thread_id] = ExportingThread()
+    #    exporting_threads[thread_id].start()
+
+    #return 'task id: #%s' % thread_id
+
+    return "All data retrieved"
+    #return render_template('index.html', sortedA=library.get('playlists'),
+    #                       subheader_message="Playlists retrieved with track count "+str(len(library['tracks'])),
+    #                       library=library,
+    #                        **session)
 
 
 
@@ -291,6 +328,7 @@ def downloadData():
 
 
 @app.route('/orphanedTracks')
+@login_required
 def getOrphanedTracks():
     tracks = analyze.getOrphanedTracks(analyze.loadLibraryFromFiles(_getDataPath()))
     library= {}
@@ -304,6 +342,7 @@ def getOrphanedTracks():
 
 
 @app.route('/topartists')
+@login_required
 def getTopArtists():
     tracks = analyze.getOrphanedTracks(analyze.loadLibraryFromFiles(_getDataPath()))
     library = analyze.loadLibraryFromFiles(_getDataPath())
@@ -420,7 +459,7 @@ def progress():
     if _getUserSessionMsg() is None:
         _setUserSessionMsg('')
 
-    #print('progress called. gdata:' + _getUserSessionMsg() + ' has: '+session.get('dataLoadingProgressMsg'))
+    print('progress called. gdata:' + _getUserSessionMsg() + ' has: '+session.get('dataLoadingProgressMsg'))
     #@copy_current_request_context
 
     return Response(stream_with_context(generate(session)), mimetype='text/event-stream')
@@ -445,7 +484,7 @@ def progressSimple():
 
 
 
-def _retrieveSpotifyData():
+def _retrieveSpotifyData(session):
     session["wants_url"] = None
     infoMsg = 'Loading profile...'
     _setUserSessionMsg(infoMsg)
@@ -476,7 +515,8 @@ def _retrieveSpotifyData():
     print("retrieving audio_features...")
     _setUserSessionMsg("Profile loaded. Loading audio features..." + analyze.getLibrarySize(library))
     library['audio_features'] = getAudioFeatures(library['tracks'], file_path)
-    _setUserSessionMsg("All data loaded "+analyze.getLibrarySize(library))
+    _setUserSessionMsg("All data loaded. "+analyze.getLibrarySize(library))
+    print("All data downloaded "+analyze.getLibrarySize(library))
     return library
 
 
@@ -714,5 +754,5 @@ def blog():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', threaded=True, debug=True)
+    app.run(host='127.0.0.1', threaded=True, debug=True)
 
