@@ -167,7 +167,7 @@ def login():
 @app.route('/revoke')
 def revoke():
     print ("doing revoke")
-    #spotify.revoke()
+    spotify.revoke()
 
 
 @app.route('/logout')
@@ -231,11 +231,13 @@ def spotify_authorized():
 
         userId = getAllMeItems('')
         session['username'] = userId
+        print(str(session.get("wants_url")))
 
         if session.get("wants_url") is not None:
             return redirect(session["wants_url"])
         else:
-            return redirect("/")
+            return redirect("/dataload")
+            #return redirect("/")
             #print('This should never happen. wants_url missing in session')
 
         #return render_template('index.html')
@@ -339,6 +341,17 @@ def getOrphanedTracks():
                            library=library,
                             **session)
 
+
+
+
+@app.route('/dataload')
+@login_required
+def dataload():
+
+    return render_template('dataload.html', sortedA=None,
+                           subheader_message="data load ",
+                           library={},
+                            **session)
 
 
 @app.route('/topartists')
@@ -447,7 +460,7 @@ def generate(sessionLocal):
             yield s + "\n\n"
             #print("generator yielding: " + s)
             x = x + 10
-            time.sleep(0.5)
+            time.sleep(0.3)
 
 
 @app.route('/progress')
@@ -495,7 +508,7 @@ def _retrieveSpotifyData(session):
     file_path = _getDataPath()
 
     print("retrieving top artists...")
-    _setUserSessionMsg("Profile loaded. Loading top artists..." + analyze.getLibrarySize(library))
+    _setUserSessionMsg("Loading top artists..." + analyze.getLibrarySize(library))
     library['topartists'] = getAllMeItems('top/artists', file_path)
 
     print("retrieving top tracks...")
@@ -507,15 +520,15 @@ def _retrieveSpotifyData(session):
     library['playlists'] = getAllMeItems('playlists', file_path)
 
     print("retrieving tracks...")
-    _setUserSessionMsg("Profile loaded. Loading tracks..." + analyze.getLibrarySize(library))
+    _setUserSessionMsg("Loading tracks..." + analyze.getLibrarySize(library))
     library['tracks'] = getAllMeItems('tracks', file_path)
     print("retrieving albums...")
-    _setUserSessionMsg("Profile loaded. Loading albums..." + analyze.getLibrarySize(library))
+    _setUserSessionMsg("Loading albums..." + analyze.getLibrarySize(library))
     library['albums'] = getAllMeItems('albums', file_path)
     print("retrieving audio_features...")
-    _setUserSessionMsg("Profile loaded. Loading audio features..." + analyze.getLibrarySize(library))
+    _setUserSessionMsg("Loading audio features..." )
     library['audio_features'] = getAudioFeatures(library['tracks'], file_path)
-    _setUserSessionMsg("All data loaded. "+analyze.getLibrarySize(library))
+    _setUserSessionMsg("All data loaded <br>"+analyze.getLibrarySize(library))
     print("All data downloaded "+analyze.getLibrarySize(library))
     return library
 
@@ -621,7 +634,7 @@ def getAudioFeatures(file_path='data/'):
 
 
 def getAudioFeatures(tracks, file_path='data/'):
-    print ("Retrieving audio features from spotify for type ",type)
+    print ("Retrieving audio features from spotify for tracks ")
     if (session!=None and session.get('token')!=None):
         oauthtoken = session['token']['access_token']
     else:
@@ -651,6 +664,7 @@ def getAudioFeatures(tracks, file_path='data/'):
             featureBatch = featureBatch.get('audio_features')
             lastFeatureBatch = featureBatch
             features += featureBatch
+            _setUserSessionMsg('Loading audio features... ' + str(len(features)) + '/' + str(len(tracks)))
             limit = 100
             ids.clear()
 

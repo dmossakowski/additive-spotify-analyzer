@@ -73,47 +73,58 @@
 	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
 
-
 <script>
 //https://stackoverflow.com/questions/9933619/html5-eventsource-listener-for-all-events
+
+
+
+
+
+	function retrieveData() {
 
 		var eventSource = new EventSource("/progress");
 		var lastUpdate = ' ';
 		eventSource.onmessage = function(e) {
 			var targetContainer = document.getElementById('progressMessages');
-    		//targetContainer.innerHTML = "<pre>"+e.data+"</pre>";
-    		targetContainer.innerHTML = e.data;
+    		targetContainer.innerHTML = "<h3>"+e.data+"</h3>";
+    		//targetContainer.innerHTML = e.data;
     		lastUpdate = e.data;
 
     		console.log('progress '+e.data+' '+e.msg)
     		console.log(e)
 
 
-			if(e.data.includes('100')){
-				//console.log(' closing source ')
-				//eventSource.close()
+			if(e.data.includes('All data loaded')){
+				console.log(' closing source ')
+				eventSource.close()
 			}
 		};
 
 
-
-		function retrieveData() {
 		var targetContainer = document.getElementById('progressMessages');
     		//targetContainer.innerHTML = "<pre>"+e.data+"</pre>";
-    		targetContainer.innerHTML = " Loading... ";
+    		//targetContainer.innerHTML = " ";
+		var updateButtonContainer = document.getElementById('updateButton');
+		updateButtonContainer.innerHTML = ""
 
-    		console.log('Loading... ')
+
+
+    		//console.log('Loading... ')
       $.ajax({
            type: "GET",
            url: '/datadownload',
            data:{action:'call_this'},
            success:function(html) {
-             alert(html);
+             //alert(html);
+             //window.location.href = '/topartists'
+             //targetContainer.innerHTML = "<h3>"+lastUpdate+"<br>";
+             updateButtonContainer.innerHTML = '<br><a href=/orphanedTracks>Try Orphaned Tracks analysis </a>'
            }
 
       });
  }
 	</script>
+
 
 
 	</head>
@@ -136,9 +147,8 @@
 						{% if username is defined %}
 
 							<!--li><a href="/progresstest">Progress</a></li-->
-							<li><a href="#" onClick="retrieveData()">Update data</a></li>
+							<li><a href="/dataload">Update data</a></li>
 
-							<li><a class="popup-modal" href="#test-modal">Open modal</a></li>
 							<li>
 								<a href="/analyze" class="fh5co-sub-ddown">Analysis</a>
 								<ul class="fh5co-sub-menu">
@@ -165,7 +175,7 @@
 
 
 						<!--div id="progressMessages" class="badge col-xs-pull-3 text-center code pre"-->
-			<div id="progressMessages" class="text-center text-muted small samp pre"><font color="white">Welcome</font></div>
+			<!-- div id="progressMessages" class="text-center text-muted small samp pre"><font color="white">Welcome</font></div>
 		<!-- end:header-top -->
 
 				 {% block topcontent %} {% endblock %}
