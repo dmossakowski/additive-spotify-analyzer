@@ -607,7 +607,7 @@ def getAllMeItems(itemtype, file_path="data/"):
 @login_required
 def getAudioFeatures(file_path='data/'):
     print ("retrieving audio features...")
-    library = analyze.loadLibraryFromFiles()
+    library = analyze.loadLibraryFromFiles(_getDataPath())
 
     audioFeatures = library['audio_features']
     if audioFeatures == None:
@@ -626,7 +626,7 @@ def getAudioFeatures(file_path='data/'):
         os.makedirs(directory)
 
 
-    bar = saagraph.create_dataseries()
+    bar = saagraph.create_dataseries(_getDataPath())
 
     return render_template('timeseries.html', sortedA=audioFeatures,
                            subheader_message="Audio features retrieved "+str(len(audioFeatures)),
@@ -708,7 +708,7 @@ def analyzeLocal():
         #        }
         #data = pd
 
-        return render_template('timeseries.html', subheader_message="Local data processed in " +
+        return render_template('trackslist.html', subheader_message="Local data processed in " +
                                                                str(time.process_time() - start)+"ms. Track count "
                                 +str(len(sortedA)),
                                sortedA=sortedA, diagramVersion="test", library=library, **session)
@@ -722,8 +722,10 @@ def analyzeLocal():
 def getlibrary():
     ds = request.args
 
-    library = analyze.loadLibraryFromFiles()
+    library = analyze.loadLibraryFromFiles(_getDataPath())
 
+    if library is None:
+        print(" library is None")
     tracksWoAlbum = []
     analyze.process(library)
 
