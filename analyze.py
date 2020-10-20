@@ -74,6 +74,9 @@ def loadLibraryFromFiles(directory="data/"):
     if not os.path.exists(directory):
         return None
 
+    if not os.path.exists(directory+"tracks.json"):
+        return None
+
     # Dream database. Store dreams in memory for now.
     dreamsA = ['Python. Python, everywhere.']
     numberA = 10
