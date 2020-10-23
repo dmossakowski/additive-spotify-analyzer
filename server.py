@@ -126,9 +126,9 @@ def index():
     hellomsg = 'Welcome to Spotify Analyzer'
     _setUserSessionMsg(None)
     library = analyze.loadLibraryFromFiles(_getDataPath())
-    genres = analyze.getTopGenreSet(library)
 
     if session.get('username'):
+        genres = analyze.getTopGenreSet(library)
         hellomsg = 'Welcome '+session.get('username')+' to Spotify Analyzer'
 
         l = analyze.getLibrarySize(library)
@@ -136,7 +136,7 @@ def index():
         return render_template('index.html', subheader_message=hellomsg, genres=genres, library=library, **session)
     else:
 
-        return render_template('login.html', subheader_message=hellomsg, genres=genres, library=library,  **session)
+        return render_template('login.html', subheader_message=hellomsg, genres={}, library={},  **session)
 
     #accessToken = session.get('access_token')
     #session2 = session
@@ -332,6 +332,11 @@ def downloadData():
 @app.route('/orphanedTracks')
 @login_required
 def getOrphanedTracks():
+    library = analyze.loadLibraryFromFiles(_getDataPath())
+    if library is None:
+        return render_template('dataload.html', subheader_message="",
+                               library=library,
+                               **session)
     tracks = analyze.getOrphanedTracks(analyze.loadLibraryFromFiles(_getDataPath()))
     library= {}
     library['tracks'] = tracks
@@ -349,7 +354,7 @@ def getOrphanedTracks():
 def dataload():
 
     return render_template('dataload.html', sortedA=None,
-                           subheader_message="data load ",
+                           subheader_message="",
                            library={},
                             **session)
 
@@ -357,8 +362,12 @@ def dataload():
 @app.route('/topartists')
 @login_required
 def getTopArtists():
-    tracks = analyze.getOrphanedTracks(analyze.loadLibraryFromFiles(_getDataPath()))
     library = analyze.loadLibraryFromFiles(_getDataPath())
+    if library is None:
+        return render_template('dataload.html', subheader_message="",
+                               library=library,
+                               **session)
+    tracks = analyze.getOrphanedTracks(analyze.loadLibraryFromFiles(_getDataPath()))
     library['tracks'] = tracks
     genres = analyze.getTopGenreSet(library)
 
@@ -606,8 +615,13 @@ def getAllMeItems(itemtype, file_path="data/"):
 @app.route('/audio_features')
 @login_required
 def getAudioFeatures(file_path='data/'):
-    print ("retrieving audio features...")
+    #print ("retrieving audio features...")
     library = analyze.loadLibraryFromFiles(_getDataPath())
+
+    if library is None:
+        return render_template('dataload.html', subheader_message="",
+                               library={},
+                               **session)
 
     audioFeatures = library['audio_features']
     if audioFeatures == None:
@@ -698,6 +712,10 @@ def analyzeLocal():
 
     library = analyze.loadLibraryFromFiles(_getDataPath())
 
+    if library is None:
+        return render_template('dataload.html', subheader_message="",
+                               library=library,
+                               **session)
     if library:
         start = time.process_time()
         sortedA = analyze.process(library)

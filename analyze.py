@@ -60,7 +60,7 @@ def getTopGenreSet(library):
         return genres
 
 
-    for track in library['topartists']:
+    for track in library.get('topartists'):
         genres.extend(track.get('genres'))
 
     for word in genres:
