@@ -7,13 +7,14 @@
 			<div class="container">
 				<div class="row text-center heading-section">
 					<!--div class="col-md-8 col-md-offset-2 text-center heading-section animate-box"-->
-					<br>	<h3>Track features time series</h3>
+					<br>	<h3>Track features as a time series</h3>
 
 
 
 {{ subheader_message }}
                         <br>
-                        The Plotly graph below shows features for all tracks added.
+                        The Plotly graph below shows features for all tracks added. It is interactive so try it out. Hover to find
+                    track's name and click on the various features on the right to show/hide them.
     <div class="chart" id="bargraph"  style="width:1200px;height:600px;">
     <script>
         var graphs = {{plot | safe}};

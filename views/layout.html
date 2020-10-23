@@ -81,6 +81,8 @@
 
 
 	function retrieveData() {
+		var targetContainer = document.getElementById('progressMessages');
+    	targetContainer.innerHTML = "<h3>Loading...</h3>";
 
 		var eventSource = new EventSource("/progress");
 		var lastUpdate = ' ';
@@ -118,7 +120,7 @@
              //alert(html);
              //window.location.href = '/topartists'
              //targetContainer.innerHTML = "<h3>"+lastUpdate+"<br>";
-             updateButtonContainer.innerHTML = '<br><a href=/orphanedTracks>Try Orphaned Tracks analysis </a>'
+             updateButtonContainer.innerHTML = ''
            }
 
       });
