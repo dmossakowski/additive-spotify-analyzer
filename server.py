@@ -136,7 +136,7 @@ def index():
         return render_template('index.html', subheader_message=hellomsg, genres=genres, library=library, **session)
     else:
 
-        return render_template('login.html', subheader_message=hellomsg, genres={}, library={},  **session)
+        return render_template('index.html', subheader_message=hellomsg, genres={}, library={},  **session)
 
     #accessToken = session.get('access_token')
     #session2 = session
@@ -372,7 +372,26 @@ def getTopArtists():
     genres = analyze.getTopGenreSet(library)
 
     return render_template('topartists.html', sortedA=tracks,
-                           subheader_message="Orphaned tracks count "+str(len(library['tracks'])),
+                           subheader_message="Top artists  "+str(len(library['tracks'])),
+                           library=library,
+                           genres=genres,
+                            **session)
+
+
+@app.route('/topgenres')
+@login_required
+def getTopGenres():
+    library = analyze.loadLibraryFromFiles(_getDataPath())
+    if library is None:
+        return render_template('dataload.html', subheader_message="",
+                               library=library,
+                               **session)
+    tracks = analyze.getOrphanedTracks(analyze.loadLibraryFromFiles(_getDataPath()))
+    library['tracks'] = tracks
+    genres = analyze.getTopGenreSet(library)
+
+    return render_template('topgenres.html', sortedA=tracks,
+                           subheader_message="Top Genres "+str(len(library['tracks'])),
                            library=library,
                            genres=genres,
                             **session)
@@ -707,7 +726,7 @@ def retrieveAudioFeatures(api_url, auth_header):
 
 
 
-@app.route("/analyze")
+@app.route("/trackslist")
 def analyzeLocal():
 
     library = analyze.loadLibraryFromFiles(_getDataPath())

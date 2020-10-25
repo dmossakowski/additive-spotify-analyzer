@@ -152,14 +152,17 @@
 							<li><a href="/dataload">Update data</a></li>
 
 							<li>
-								<a href="/analyze" class="fh5co-sub-ddown">Analysis</a>
+								<a href="/orphanedTracks" class="fh5co-sub-ddown">Analysis</a>
 								<ul class="fh5co-sub-menu">
-									<li><a href="/topartists">Top Artists</a></li>
+									<li><a href="/audio_features">Audio features graph</a></li>
+									<li><a href="/orphanedTracks">Orphaned tracks</a></li>
+									<li><a href="/topartists">Top artists</a></li>
+									<li><a href="/topgenres">Top genres</a></li>
 
-									<li><a href="/analyze">Track list</a></li>
+									<li><a href="/trackslist">Track list</a></li>
 									<!--li><a href="/audio_features">Audio Features</a></li-->
-									<li><a href="/orphanedTracks">Orphaned Tracks</a></li>
-									<li><a href="/audio_features">Audio Features</a></li>
+
+
 								</ul>
 							</li>
 								{% endif %}
@@ -168,6 +171,8 @@
 							<!--li><a href="contact.html">Contact</a></li-->
 							{% if username is defined %}
 							<li><a href="/logout">Logout</a></li>
+							{% else %}
+							<li><a href="/logout">Login</a></li>
 							{% endif %}
 						</ul>
 					</nav>
