@@ -1,7 +1,9 @@
 
 {% extends "layout.html" %}
 
-				{% block topcontent %}
+
+{% block topcontent %}
+	<div  style="background-image: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.8)), url(public/images/group-of-people-1587927.jpg);  background-size: cover;">
 
 		<!--div id="fh5co-blog-section" class="fh5co-section-gray"-->
 			<div class="container">
@@ -13,17 +15,11 @@
                         <br>
                         This is a test of Jinja looping.
 
-                    </div></div><!--/div--><!--/div-->
-	{% endblock %}
+                </div>
+            </div><!--/div--><!--/div-->
 
-
-{% block secondarycontent %}
 
 <div class="container-fluid">
-
-
-
-
 
 <table class="table thead-dark table-hover">
          <thead><tr>
@@ -44,6 +40,11 @@
      </table>
 
                     </div>
+
+</div>
+{% endblock %}
+
+{% block secondarycontent %}
 
 	{% endblock %}
 

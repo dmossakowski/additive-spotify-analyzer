@@ -176,8 +176,16 @@ def logout():
     session.pop('token', None)
     session.pop('username', None)
     session.pop('wants_url', None)
+    session.pop('access_token', None)
+    session['access_token'] = None
+    session['logged_in'] = False
+    session['refresh_token'] = None
+    session['expires_at'] = None
+    session['expires_in'] = None
+    session.clear()
     _setUserSessionMsg('You have been logged out')
-    #spotify.revoke
+    spotify.token
+
     return render_template('login.html',
                            subheader_message="Logged out ",
                            library={}, **session)
@@ -536,25 +544,25 @@ def _retrieveSpotifyData(session):
     file_path = _getDataPath()
 
     print("retrieving top artists...")
-    _setUserSessionMsg("Loading top artists..." + analyze.getLibrarySize(library))
+    #_setUserSessionMsg("Loading top artists..." + analyze.getLibrarySize(library))
     library['topartists'] = getAllMeItems('top/artists', file_path)
 
     print("retrieving top tracks...")
-    _setUserSessionMsg("Top artists loaded. Loading top tracks..." + analyze.getLibrarySize(library))
+    #_setUserSessionMsg("Top artists loaded. Loading top tracks..." + analyze.getLibrarySize(library))
     library['toptracks'] = getAllMeItems('top/tracks', file_path)
 
     print("retrieving playlists...")
-    _setUserSessionMsg("Top artists loaded. Loading playlists..." + analyze.getLibrarySize(library))
+    #_setUserSessionMsg("Top artists loaded. Loading playlists..." + analyze.getLibrarySize(library))
     library['playlists'] = getAllMeItems('playlists', file_path)
 
     print("retrieving tracks...")
-    _setUserSessionMsg("Loading tracks..." + analyze.getLibrarySize(library))
+    #_setUserSessionMsg("Loading tracks..." + analyze.getLibrarySize(library))
     library['tracks'] = getAllMeItems('tracks', file_path)
     print("retrieving albums...")
-    _setUserSessionMsg("Loading albums..." + analyze.getLibrarySize(library))
+    #_setUserSessionMsg("Loading albums..." + analyze.getLibrarySize(library))
     library['albums'] = getAllMeItems('albums', file_path)
     print("retrieving audio_features...")
-    _setUserSessionMsg("Loading audio features..." )
+    #_setUserSessionMsg("Loading audio features..." )
     library['audio_features'] = getAudioFeatures(library['tracks'], file_path)
     _setUserSessionMsg("All data loaded <br>"+analyze.getLibrarySize(library))
     print("All data downloaded "+analyze.getLibrarySize(library))
@@ -602,7 +610,7 @@ def getAllMeItems(itemtype, file_path="data/"):
         _setUserSessionMsg('Loading '+str(itemtype)+'... '+str(len(items))+'/'+str(response['total']))
 
     print('retrieved '+str(itemtype)+' size '+str(len(items)))
-    _setUserSessionMsg('Loaded all '+str(itemtype))
+    _setUserSessionMsg('Loaded '+str(len(items))+' '+str(itemtype))
 
     for item in items:
         if item.get('track'):

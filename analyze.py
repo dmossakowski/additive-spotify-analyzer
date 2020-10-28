@@ -59,13 +59,19 @@ def getTopGenreSet(library):
     if library is None:
         return genres
 
-
     for track in library.get('topartists'):
         genres.extend(track.get('genres'))
 
     for word in genres:
         cnt[word] += 1
-    return cnt.most_common(10)
+
+    mostcommon=[]
+    c=11
+    # put the weight as the second param instead of number of time it appears
+    for i, mc in enumerate(cnt.most_common(c)):
+        mostcommon.append([mc[0],c-i])
+    #return cnt.most_common(12)
+    return mostcommon
 
 
 def loadLibraryFromFiles(directory="data/"):
