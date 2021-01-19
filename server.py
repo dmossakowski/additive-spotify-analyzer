@@ -9,6 +9,7 @@ from flask import Flask, redirect, url_for, session, request, render_template, s
 #from flask_oauthlib.client import OAuth, OAuthException
 from authlib.integrations.flask_client import OAuth
 from authlib.integrations.flask_client import OAuthError
+from gevent import monkey; monkey.patch_socket()
 import requests
 import json
 import pandas as pd
