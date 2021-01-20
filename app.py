@@ -4,8 +4,7 @@ monkey.patch_socket()
 
 print ('monkey patching done')
 worker_class = 'gevent'
-
-
+log_level = 'debug'
 
 
 
