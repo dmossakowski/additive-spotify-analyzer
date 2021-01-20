@@ -1,10 +1,11 @@
 from gevent import monkey
 
-monkey.patch_socket()
+monkey.patch_all()
+
+log_level = 'debug'
 
 print ('monkey patching done')
 worker_class = 'gevent'
-log_level = 'debug'
 
 
 
