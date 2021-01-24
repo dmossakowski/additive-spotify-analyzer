@@ -1,12 +1,15 @@
 import calendar
 from datetime import datetime, date, time, timedelta
 import numpy as np
+import plotly
 import plotly.graph_objects as go
+
 import datetime
 import functools as functools
 from sklearn.preprocessing import MinMaxScaler
 
 import analyze
+import random
 
 from sklearn.cluster import KMeans
 
@@ -224,6 +227,108 @@ def create_dataseries(dataPath):
                                    hoverinfo="text",
                                    hovertext=dataSeries[:, 1]))
 
+    graphJSON = fig.to_json()
+    return graphJSON
+
+
+
+
+
+# this is called from Audio Features Graph
+#
+def create_top_artists_graph(dataPath):
+    fullLib = analyze.loadLibraryFromFiles(dataPath)
+
+    topartists = []
+
+    topartists.append([art['name'] for i, art in enumerate(fullLib['topartists_long_term'])][:50])
+    topartists.append([art['name'] for art in fullLib['topartists_medium_term']][:50])
+    topartists.append([art['name'] for art in fullLib['topartists_short_term']][:20])
+
+    #topartists = np.array(topartists)
+    #topartists = topartists.reshape(-1,1)
+    topartistsranking = []
+    topartistsrankingM = {}
+
+    for i, artistlist in enumerate(topartists):
+        topartistsranking.append([])
+        for j, artist in enumerate(artistlist):
+            topartistsrankingM.setdefault(artist,[None,None,None])
+
+    for i in range(50):
+        for j in range(3):
+            artist = topartists[j][i:i+1]
+            if len(artist) > 0:
+                a = topartistsrankingM.get(artist[0])
+                a[j] = i+1 # so that most favorite artist is at position 1 instead of 0
+
+    print (' done')
+
+    colors = [plotly.colors.DEFAULT_PLOTLY_COLORS[random.randrange(1, 10)] for i in range(len(topartistsrankingM))]
+    color = ('rgba(' + str(np.random.randint(0, high=200)) + ',' +
+             str(np.random.randint(0, high=250)) + ',' +
+             str(np.random.randint(0, high=100)))
+
+    colors = ['rgba(200,121,121','rgba(60,121,60','rgba(121,60,256','rgba(33,33,33',
+              'rgba(200,180,60','rgba(121,200,33','rgba(33,121,255','rgba(121,66,33',
+              'rgba(255,60,121', 'rgba(33,170,121', 'rgba(0,66,66', 'rgba(121,66,121',
+              'rgba(255,60,0', 'rgba(33,155,0', 'rgba(66,200,0', 'rgba(121,66,0',
+              'rgba(255,0,33','rgba(66,121,255','rgba(66,66,255','rgba(66,200,200']
+    weights = [random.randint(15, 35) for i in range(50)]
+    xaxis = ['Long Term (several years)','About last six months', 'About last four weeks']
+    data = []
+    for i, (artist, yaxis)  in enumerate(topartistsrankingM.items()):
+        weights2 = [*range(11, len(topartistsrankingM)+5)]
+        weights3 = [x/2 for x in range(1,len(topartistsrankingM))]
+        color = colors[i%len(colors)]
+        visibletrace = 'legendonly'
+        if len(list(filter(None, yaxis)))>1:
+            visibletrace = True
+        #print("")
+        data.append(go.Scatter(x=xaxis, y=yaxis,
+                                mode="markers+lines",
+                                marker={'opacity': 0.8, 'size':11, 'symbol':'diamond-wide-dot'},
+                                line={'color':color+',0.4)', 'width':2,
+                                         'dash':'dot'},
+                                name = artist,
+                                hoverinfo='text',
+                                text='<b>'+artist+'</b> <br> All time popularity: '+str(yaxis[0]) +
+                                '<br> In the last 6 months: '+str(yaxis[1])+'<br> Recently: '+str(yaxis[2]) +
+                               ' <br> Color: '+color,
+                                textfont={'size': weights2, 'color': color+',1)'},
+                               visible=visibletrace
+                               )
+                    )
+
+    tickvals = [1,5,10,15,20,25,30,35,40,45,50]
+    ticktext = ['1', '5', '10', 'Seven', 'Nine', 'Eleven']
+
+    default_linewidth = 2
+    highlighted_linewidth_delta = 2
+    layout = go.Layout({'title':'Change of artist popularity over time (most popular on top)',
+                        'font':{ 'size':15},
+                        'xaxis': {'showgrid': False, 'showticklabels': True, 'zeroline': False},
+                        'yaxis': {'showgrid': True, 'showticklabels': True, 'zeroline': False,
+                                  'autorange':'reversed',
+                                  #'tick0':1, 'dtick':'2', 'nticks':10,
+                                  'tickvals': tickvals,
+                                  #'tickmode':'array', 'tickvals':tickvals, 'ticktext':ticktext
+                                  },
+                        'legend':{ 'font':{ 'size':11 }},
+                        'hovermode':'y'
+
+                        })
+
+
+    #fig = go.Figure(data=data, layout=layout)
+    #fig.update_yaxes(automargin=True)
+    #fig.update_traces(textposition='top right')
+
+    fig = go.FigureWidget(data=data, layout=layout)
+    fig.layout.hovermode = 'closest'
+    fig.layout.hoverdistance = -1  # ensures no "gaps" for selecting sparse data
+
+    #fig.show()
     graphJSON = fig.to_json()
     return graphJSON
 
@@ -585,5 +690,5 @@ def dataofish():
 
 
 #create_dataseries('127108998-data/')
-
+#create_top_artists_graph('127108998-data/')
 # dataofish()

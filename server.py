@@ -1,4 +1,3 @@
-from gevent import monkey; monkey.patch_socket()
 import base64
 import io
 import urllib
@@ -777,6 +776,30 @@ def analyzeLocal():
         return render_template('index.html', subheader_message="Local data not found. Click to retrieve.",
                                library={},
                                **session)
+
+
+
+@app.route('/favorite_artists_over_time')
+@login_required
+def getFavoriteArtistsOverTime(file_path='data/'):
+    #print ("retrieving audio features...")
+    library = analyze.loadLibraryFromFiles(_getDataPath())
+
+    if library is None or library.get('topartists_short_term') is None:
+        return render_template('dataload.html', subheader_message="",
+                               library={},
+                               **session)
+
+    directory = os.path.dirname(file_path)
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    bar = saagraph.create_top_artists_graph(_getDataPath())
+
+    return render_template('favorite_artists_over_time.html', sortedA=None,
+                           subheader_message='',
+                           plot=bar, **session)
+
 
 
 @app.route("/library")
