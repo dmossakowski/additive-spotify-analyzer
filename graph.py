@@ -1,15 +1,12 @@
 import calendar
 from datetime import datetime, date, time, timedelta
 import numpy as np
-import plotly
 import plotly.graph_objects as go
-
 import datetime
 import functools as functools
 from sklearn.preprocessing import MinMaxScaler
 
 import analyze
-import random
 
 from sklearn.cluster import KMeans
 
@@ -32,6 +29,9 @@ def _getFeatures(dataPath, keys=['danceability', 'energy', 'key', 'loudness', 'm
     #      'valence', 'tempo'):
 
     dataArray = []
+
+    if len(dataOrig) == 0:
+        return dataArray
 
     for key in dataOrig[0]:
         if key in keys:
@@ -233,9 +233,7 @@ def create_dataseries(dataPath):
 
 
 
-
-# this is called from Audio Features Graph
-#
+# this is called to create favorite artists graph
 def create_top_artists_graph(dataPath):
     fullLib = analyze.loadLibraryFromFiles(dataPath)
 
@@ -253,7 +251,7 @@ def create_top_artists_graph(dataPath):
     for i, artistlist in enumerate(topartists):
         topartistsranking.append([])
         for j, artist in enumerate(artistlist):
-            topartistsrankingM.setdefault(artist,[None,None,None])
+            topartistsrankingM.setdefault(artist, [None, None, None])
 
     for i in range(50):
         for j in range(3):
@@ -262,9 +260,9 @@ def create_top_artists_graph(dataPath):
                 a = topartistsrankingM.get(artist[0])
                 a[j] = i+1 # so that most favorite artist is at position 1 instead of 0
 
-    print (' done')
+    #print(' done')
 
-    colors = [plotly.colors.DEFAULT_PLOTLY_COLORS[random.randrange(1, 10)] for i in range(len(topartistsrankingM))]
+    #colors = [plotly.colors.DEFAULT_PLOTLY_COLORS[random.randrange(1, 10)] for i in range(len(topartistsrankingM))]
     color = ('rgba(' + str(np.random.randint(0, high=200)) + ',' +
              str(np.random.randint(0, high=250)) + ',' +
              str(np.random.randint(0, high=100)))
@@ -274,28 +272,59 @@ def create_top_artists_graph(dataPath):
               'rgba(255,60,121', 'rgba(33,170,121', 'rgba(0,66,66', 'rgba(121,66,121',
               'rgba(255,60,0', 'rgba(33,155,0', 'rgba(66,200,0', 'rgba(121,66,0',
               'rgba(255,0,33','rgba(66,121,255','rgba(66,66,255','rgba(66,200,200']
-    weights = [random.randint(15, 35) for i in range(50)]
-    xaxis = ['Long Term (several years)','About last six months', 'About last four weeks']
+
+
+    #weights = [random.randint(15, 35) for i in range(50)]
+    xaxis = ['Long Term (several years)','Medium Term (last six months)', 'Very recent (last four weeks)']
     data = []
     for i, (artist, yaxis)  in enumerate(topartistsrankingM.items()):
-        weights2 = [*range(11, len(topartistsrankingM)+5)]
-        weights3 = [x/2 for x in range(1,len(topartistsrankingM))]
-        color = colors[i%len(colors)]
-        visibletrace = 'legendonly'
-        if len(list(filter(None, yaxis)))>1:
+        #weights2 = [*range(11, len(topartistsrankingM)+5)]
+        #weights3 = [x/2 for x in range(1,len(topartistsrankingM))]
+        weights2 = 10
+        #color = colors[i % len(colors)]
+        red = 200*((len(topartistsrankingM)-i)/len(topartistsrankingM))
+        color = ('rgba(' + str(red) + ',' + \
+                 str(np.random.randint(0, high=100)) + ',' + \
+                 str(np.random.randint(0, high=120)))
+        #color = yaxis
+        #visibletrace = 'legendonly'
+        yaxisStrings = yaxis.copy()
+        for i,y in enumerate(yaxisStrings):
+            if y is None:
+                yaxisStrings[i] = '--'
+            else:
+                yaxisStrings[i] = str(yaxis[i])
+
+        hovertemplatetext = '<b>' + artist + ' </b><br>All time popularity: ' + yaxisStrings[0] + \
+               '<br>In the last six months: ' + yaxisStrings[1] + '<br>Recently: ' + yaxisStrings[2] + \
+               '<extra></extra>'
+        if len(list(filter(None, yaxis))) > 1:
             visibletrace = True
+            mode = "markers+text+lines"
+            text = ['<b>'+artist+'</b>','<b>'+artist+'</b>','<b>'+artist+'</b>']
+            hovertemplate=hovertemplatetext
+            marker = {'opacity': 0.1, 'size': 11, 'symbol': 'diamond-wide-dot'}
+        else:
+            mode = "markers+lines"
+            text= ''
+            visibletrace = True
+            hovertemplate=hovertemplatetext
+            marker = {'opacity': 0.7, 'size': 11, 'symbol': 'diamond-wide-dot'}
         #print("")
+
         data.append(go.Scatter(x=xaxis, y=yaxis,
-                                mode="markers+lines",
-                                marker={'opacity': 0.8, 'size':11, 'symbol':'diamond-wide-dot'},
-                                line={'color':color+',0.4)', 'width':2,
-                                         'dash':'dot'},
+                                mode=mode,
+                                marker=marker,
+                                line={'color':color+',0.5)', 'width':1, 'dash':'dot'},
+                               #line={'width': 1, 'dash': 'dot'},
                                 name = artist,
-                                hoverinfo='text',
-                                text='<b>'+artist+'</b> <br> All time popularity: '+str(yaxis[0]) +
-                                '<br> In the last 6 months: '+str(yaxis[1])+'<br> Recently: '+str(yaxis[2]) +
-                               ' <br> Color: '+color,
+                                #hoverinfo='text',
+                                text=text,
+                                #hovertext = text,
+                               hovertemplate=hovertemplate,
+                               #color=color,
                                 textfont={'size': weights2, 'color': color+',1)'},
+                               #textfont={'size': weights2},
                                visible=visibletrace
                                )
                     )
@@ -305,7 +334,7 @@ def create_top_artists_graph(dataPath):
 
     default_linewidth = 2
     highlighted_linewidth_delta = 2
-    layout = go.Layout({'title':'Change of artist popularity over time (most popular on top)',
+    layout = go.Layout({'title':'Change of artist popularity over time',
                         'font':{ 'size':15},
                         'xaxis': {'showgrid': False, 'showticklabels': True, 'zeroline': False},
                         'yaxis': {'showgrid': True, 'showticklabels': True, 'zeroline': False,
@@ -315,10 +344,12 @@ def create_top_artists_graph(dataPath):
                                   #'tickmode':'array', 'tickvals':tickvals, 'ticktext':ticktext
                                   },
                         'legend':{ 'font':{ 'size':11 }},
-                        'hovermode':'y'
+                        'hovermode':'y',
+                        'hoverlabel_align' : 'right',
+                        'width' : 1200,
+                        'height' : 750
 
-                        })
-
+    })
 
     #fig = go.Figure(data=data, layout=layout)
     #fig.update_yaxes(automargin=True)
@@ -690,5 +721,5 @@ def dataofish():
 
 
 #create_dataseries('127108998-data/')
-#create_top_artists_graph('127108998-data/')
+
 # dataofish()
