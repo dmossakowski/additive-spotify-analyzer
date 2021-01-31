@@ -236,7 +236,8 @@ figure {
   margin: 7px 0 0 0 !important; }
 
 .sf-menu {
-  float: right; }
+  float: right;
+  width: 400; }
 
 .sf-menu ul {
   box-shadow: none;
