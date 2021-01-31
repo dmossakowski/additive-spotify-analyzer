@@ -347,8 +347,8 @@ def create_top_artists_graph(dataPath):
                         'hovermode':'y',
                         'hoverlabel_align' : 'right',
                         'width' : 1200,
-                        'height' : 750
-
+                        'height' : 750,
+                        'margin' : { 'l':50, 'r':50, 'b':50, 't':80,'pad':4 }
     })
 
     #fig = go.Figure(data=data, layout=layout)
