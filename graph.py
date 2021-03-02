@@ -346,7 +346,7 @@ def create_top_artists_graph(dataPath):
                         'legend':{ 'font':{ 'size':11 }},
                         'hovermode':'y',
                         'hoverlabel_align' : 'right',
-                        'width' : 1200,
+                        #'width' : 1200,
                         'height' : 750,
                         'margin' : { 'l':50, 'r':50, 'b':50, 't':80,'pad':4 }
     })
