@@ -762,6 +762,9 @@ def analyzeLocal():
         start = time.process_time()
         sortedA = analyze.process(library)
 
+        trackCount = 0
+        for l in sortedA:
+            trackCount += len(sortedA[l])
         #data = {'First Column Name': ['First value', 'Second value', ...],
         #        'Second Column Name': ['First value', 'Second value', ...],
         #        ....
@@ -769,8 +772,8 @@ def analyzeLocal():
         #data = pd
 
         return render_template('trackslist.html', subheader_message="Local data processed in " +
-                                                               str(time.process_time() - start)+"ms. Track count "
-                                +str(len(sortedA)),
+                                                               str(time.process_time() - start)+"ms. Artist count "
+                                +str(len(sortedA))+". Track count "+str(trackCount),
                                sortedA=sortedA, diagramVersion="test", library=library, **session)
     else:
         return render_template('index.html', subheader_message="Local data not found. Click to retrieve.",
