@@ -15,7 +15,7 @@ def _getFeatures(dataPath, keys=['danceability', 'energy', 'key', 'loudness', 'm
                                  'instrumentalness', 'liveness',
                                  'valence', 'tempo']):
     dataOrig = analyze.loadAudioFeatures(dataPath)
-    # fullLib = analyze.loadLibraryFromFiles(dataPath)
+    #fullLib = analyze.loadLibraryFromFiles(dataPath)
     # list: 3799 of dict:18
     # [{'danceability': 0.469, 'energy': 0.625, 'key': 4, 'loudness': -5.381, 'mode': 0, 'speechiness': 0.0306, 'acousticness': 0.00515, 'instrumentalness': 2.03e-05, 'liveness': 0.0682, 'valence': 0.325, 'tempo': 76.785, 'type': 'audio_features', 'id': '6PBzdsMi6YNdYAevzozBRi', 'uri': 'spotify:track:6PBzdsMi6YNdYAevzozBRi', 'track_href': 'https://api.spotify.com/v1/tracks/6PBzdsMi6YNdYAevzozBRi', 'analysis_url': 'https://api.spotify
     #  {'danceability': 0.76, 'energy': 0.608, 'key': 9, 'loudness': -8.673, 'mode': 0, 'speechiness': 0.0347, 'acousticness': 0.315, 'instrumentalness': 0.79, 'liveness': 0.121, 'valence': 0.727, 'tempo': 119.032, 'type': 'audio_features', 'id': '4dJYJTPbUgFK5pCQ5bYD4g', 'uri': 'spotify:track:4dJYJTPbUgFK5pCQ5bYD4g', 'track_href': 'https://api.spotify.com/v1/tracks/4dJYJTPbUgFK5pCQ5bYD4g', 'analysis_url': 'https://api.spotify.com/v1/audio-analysis/4dJYJTPbUgFK5pCQ5bYD4g', 'duration_ms': 254118, 'time_signature': 4}
@@ -33,10 +33,24 @@ def _getFeatures(dataPath, keys=['danceability', 'energy', 'key', 'loudness', 'm
     if len(dataOrig) == 0:
         return dataArray
 
+    dummyLine = {'danceability': 0, 'energy': 0, 'key': 8, 'loudness': -8, 'mode': 1, 'speechiness': 0,
+     'acousticness': 0, 'instrumentalness': 0, 'liveness': 0, 'valence': 0, 'tempo': 102,
+     'type': 'audio_features', 'id': 'dummyTrack', 'uri': 'spotify:track:dummyTrack',
+     'track_href': 'https://api.spotify.com/v1/dummytrack',
+     'analysis_url': 'https://api.spotify.com/v1/audio-analysis/dummytrack', 'duration_ms': 666,
+     'time_signature': 4}
+
+
     for key in dataOrig[0]:
         if key in keys:
             # data[key] = [li[key] for li in dataOrig]
-            dataArray.append([li[key] for li in dataOrig])
+            for i,li in enumerate(dataOrig):
+                #print (str(key)+str(li))
+                if li is None:
+                    dataOrig[i] = dummyLine
+            t = [li[key] for li in dataOrig]
+
+            dataArray.append(t)
 
     return dataArray
 
