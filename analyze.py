@@ -93,6 +93,9 @@ def loadLibraryFromFiles(directory="data/"):
     if not os.path.exists(directory+"topartists_medium_term.json"):
         return None
 
+    if not os.path.exists(directory+"playlists-tracks.json"):
+        return None
+
     # Dream database. Store dreams in memory for now.
     dreamsA = ['Python. Python, everywhere.']
     numberA = 10
@@ -112,6 +115,11 @@ def loadLibraryFromFiles(directory="data/"):
     with open(path+"playlists.json", "r") as tracksfile:
         tracks = json.load(tracksfile)
         library['playlists'] = tracks
+
+    with open(path+"playlists-tracks.json", "r") as tracksfile:
+        tracks = json.load(tracksfile)
+        library['playlists-tracks'] = tracks
+
 
     with open(path + "toptracks_long_term.json", "r") as tracksfile:
         tracks = json.load(tracksfile)
