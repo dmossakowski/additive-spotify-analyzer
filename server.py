@@ -33,6 +33,7 @@ os.environ["AUTHLIB_INSECURE_TRANSPORT"] = "true"
 
 SPOTIFY_APP_ID = os.getenv('SPOTIFY_APP_ID')
 SPOTIFY_APP_SECRET = os.getenv('SPOTIFY_APP_SECRET')
+DATA_DIRECTORY = os.getenv('DATA_DIRECTORY')
 
 app = Flask(__name__, static_folder='public', template_folder='views')
 
@@ -457,8 +458,8 @@ def _setUserSessionMsg(msg='', msgtype=''):
 
 def _getDataPath():
     if (session.get('id')):
-        return session['id'] + "-data/"
-    return "data/"
+        return str(DATA_DIRECTORY)+"/"+session['id']+"/"
+    return str(DATA_DIRECTORY)+"/"
 
 
 @app.route('/progresstest')
@@ -614,7 +615,7 @@ def _retrieveSpotifyData(session):
     return library
 
 
-def getAllMeItems(itemtype, file_path="data/", time_range=""):
+def getAllMeItems(itemtype, file_path=None, time_range=""):
     print ("Retrieving data from spotify for type ", itemtype)
     _setUserSessionMsg('Loading ' + str(itemtype)+'...')
     oauthtoken = session['token']['access_token']

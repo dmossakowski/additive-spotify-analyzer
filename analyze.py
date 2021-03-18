@@ -78,7 +78,7 @@ def getTopGenreSet(library):
     return mostcommon
 
 
-def loadLibraryFromFiles(directory="data/"):
+def loadLibraryFromFiles(directory=None):
     library = {}
 
     if not os.path.exists(directory):
