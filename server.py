@@ -134,8 +134,9 @@ def index():
         hellomsg = 'Welcome '+session.get('username')
 
         l = analyze.getLibrarySize(library)
+        lastModifiedDt = analyze.getUpdateDtStr(_getDataPath())
         #_setUserSessionMsg("Library size: "+l)
-        return render_template('index.html', subheader_message=hellomsg, genres=genres, library=library, **session)
+        return render_template('index.html', subheader_message=hellomsg, genres=genres, library=library, sizetext=l, lastmodified=lastModifiedDt, **session)
     else:
 
         return render_template('index.html', subheader_message=hellomsg, genres={}, library={},  **session)
@@ -302,8 +303,18 @@ def refreshToken():
 @app.route('/datadownload')
 @login_required
 def downloadData():
+
+    #dataAgeS = analyze.getUpdateDtStr(_getDataPath())
+    #dataAge = analyze.getUpdateDt(_getDataPath())
+    #maxAge = dataAge + 15 * 60 # one hour
+    #currentTime = time.time()
+    #newt = datetime.datetime.fromtimestamp(maxAge).strftime('%c')
+    #if maxAge > currentTime:
+     #   return "Your data was last loaded on " + dataAgeS
+
+    #return dataAgeS+" loading <br>"+newt
+    #print(" datadownload")
     library = _retrieveSpotifyData(session)
-    print(" datadownload")
 
     @copy_current_request_context
     def handle_sub_view(session):
@@ -397,9 +408,16 @@ def getPlaylistDashboard():
 @login_required
 def dataload():
 
+    dt = analyze.getUpdateDtStr(_getDataPath())
+    l = None
+    if dt is not None:
+        library = analyze.loadLibraryFromFiles(_getDataPath())
+        l = analyze.getLibrarySize(library)
+
+
     return render_template('dataload.html', sortedA=None,
                            subheader_message="",
-                           library={},
+                           library={}, lastmodified=dt, sizetext=l,
                             **session)
 
 

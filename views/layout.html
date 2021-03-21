@@ -115,16 +115,16 @@
 
 
 
-    		//console.log('Loading... ')
+    	//console.log('Loading... ')
       $.ajax({
            type: "GET",
            url: '/datadownload',
            data:{action:'call_this'},
            success:function(html) {
              //alert(html);
-             //window.location.href = '/topartists'
-             //targetContainer.innerHTML = "<h3>"+lastUpdate+"<br>";
-             updateButtonContainer.innerHTML = 'Choose Analysis from the main menu'
+             //window.location.href = '/'
+             //targetContainer.innerHTML = "<h3>"+html+lastUpdate+"<br>";
+             updateButtonContainer.innerHTML = 'Choose analysis from the main menu'
            }
 
       });
