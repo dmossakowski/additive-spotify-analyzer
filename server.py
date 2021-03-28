@@ -719,15 +719,6 @@ def _retrieveSpotifyData(session):
     library['toptracks_medium_term'] = getAllMeItems('top/tracks', file_path, "medium_term")
     library['toptracks_long_term'] = getAllMeItems('top/tracks', file_path, "long_term")
 
-    print("retrieving playlists...")
-    #_setUserSessionMsg("Top artists loaded. Loading playlists..." + analyze.getLibrarySize(library))
-    library['playlists'] = getAllMeItems('playlists', file_path)
-
-    print("retrieving playlist tracks...")
-    # _setUserSessionMsg("Top artists loaded. Loading playlists..." + analyze.getLibrarySize(library))
-    # when retrieving all user playlists, tracks are not included so we need to do another request
-    # in the end we will have all playlists with their tracks for the user
-    library['playlists'] = getPlaylistTracks(library['playlists'], file_path)
 
     print("retrieving tracks...")
     #_setUserSessionMsg("Loading tracks..." + analyze.getLibrarySize(library))
@@ -739,6 +730,17 @@ def _retrieveSpotifyData(session):
     #_setUserSessionMsg("Loading audio features..." )
     library['audio_features'] = getAudioFeatures(library['tracks'], file_path)
     _setUserSessionMsg("All data loaded <br>"+analyze.getLibrarySize(library))
+
+    print("retrieving playlists...")
+    # _setUserSessionMsg("Top artists loaded. Loading playlists..." + analyze.getLibrarySize(library))
+    library['playlists'] = getAllMeItems('playlists', file_path)
+
+    print("retrieving playlist tracks...")
+    # _setUserSessionMsg("Top artists loaded. Loading playlists..." + analyze.getLibrarySize(library))
+    # when retrieving all user playlists, tracks are not included so we need to do another request
+    # in the end we will have all playlists with their tracks for the user
+    library['playlists'] = getPlaylistTracks(library['playlists'], file_path)
+
     print("All data downloaded "+analyze.getLibrarySize(library))
     return library
 
