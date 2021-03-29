@@ -968,11 +968,16 @@ def getPlaylistTracks(playlists, file_path='data/'):
             #break
             featureBatch = {'audio_features': {}} #dict.fromkeys(lastFeatureBatch,0)
 
-        next = featureBatch['tracks']['next']
-        while next is not None:
-            featureBatch2 = retrieveAudioFeatures(next, auth_header)
-            featureBatch['tracks']['items'].extend(featureBatch2['items'])
-            next = featureBatch2['next']
+        featureBatchTracks = featureBatch['tracks']
+        if featureBatchTracks.get('next') is not None:
+            next = featureBatch['tracks']['next']
+            while next is not None:
+                featureBatch2 = retrieveAudioFeatures(next, auth_header)
+                featureBatch['tracks']['items'].extend(featureBatch2['items'])
+                next = featureBatch2['next']
+        else:
+            print('skipping playlist which has empty next '+str(id))
+            continue
         #featureBatch = featureBatch.get('audio_features')
         #lastFeatureBatch = featureBatch
         #tracks += featureBatch
