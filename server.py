@@ -133,7 +133,8 @@ def index():
     if session.get('username'):
         genres = analyze.getTopGenreSet(library)
         hellomsg = 'Welcome '+session.get('username')
-        profile = library.get('profile')
+        if library is not None:
+            profile = library.get('profile')
         if profile is None:
             profileimageurl=None
             display_name = session.get('username')
