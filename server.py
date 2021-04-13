@@ -470,6 +470,8 @@ def getPublicPlaylistDashboard():
 
 
 
+def publicPlaylist(playlist):
+    return playlist['public'] is True and len(playlist['tracks']['items']) > 2
 
 @app.route('/randomPlaylist')
 #@login_required
@@ -488,23 +490,31 @@ def getRandomPlaylist():
 
     playlists = None
 
-    while playlists is None:
-        username = analyze.getRandomUsername(DATA_DIRECTORY)
-        library = analyze.loadLibraryFromFiles(DATA_DIRECTORY + "/" + username + "/")
-        if library is not None and library['playlists'] is not None and len(library['playlists'])>0:
-            playlists = library['playlists']
+    #while playlists is None:
+    #    username = analyze.getRandomUsername(DATA_DIRECTORY)
+    #    library = analyze.loadLibraryFromFiles(DATA_DIRECTORY + "/" + username + "/")
+    #    if library is not None and library['playlists'] is not None and len(library['playlists'])>0:
+    #        playlists = library['playlists']
 
-    playlist = None
+    playlist = analyze.getRandomPlaylist(DATA_DIRECTORY, 'playlists-tracks', publicPlaylist)
 
-    while playlist is None:
+    #while playlists is None or len(playlists)==0:
+    #    playlists = analyze.getRandom(DATA_DIRECTORY, 'playlists-tracks')
 
-        r = random.randint(0, len(playlists) - 1)
-        randomPlaylist = playlists[r]
+    #r = random.randint(0, len(playlists) - 1)
 
-        if len(library['playlists-tracks'][r]) > 1:
-            playlist = library['playlists-tracks'][r]
-            playlistName = playlist['name']
-            subheader_message = "Playlist '" + playlistName+"'"
+    #for i in range(0,len(playlists)):
+    #    i = (i + r)%len(playlists)
+    #    if playlists[i]['public'] is True:
+    #        playlist = playlists[i]
+    #        break
+
+    #for playlist in playlists:
+    #    if playlist['public'] is True:
+    print(' playlist is public ' +playlist['name']+ ' owner:'+playlist['owner']['display_name'])
+
+    playlistName = playlist['name']
+    subheader_message = "Playlist '" + playlistName+"'"
 
 
     #library= {}
@@ -512,7 +522,7 @@ def getRandomPlaylist():
 
     return render_template('randomPlaylist.html', playlistName=playlistName, playlist=playlist,
                            subheader_message=subheader_message,
-                           library=library,
+                           library=None,
                             **session)
 
 

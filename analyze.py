@@ -85,7 +85,7 @@ def getTopGenreSet(library):
 def getUpdateDt(directory=None):
     if not isLibraryValid(directory):
         return None
-    list_of_files = glob.glob(directory+"/*json")  # * means all if need specific format then *.csv
+    list_of_files = glob.glob(directory+"/tracks.json")  # * means all if need specific format then *.csv
     if len(list_of_files) == 0:
         return None
     latest_file = max(list_of_files, key=os.path.getmtime)
@@ -116,7 +116,6 @@ def isLibraryValid(directory=None):
 
     if not os.path.exists(directory+"playlists-tracks.json"):
         return False
-
 
     return True
 
@@ -205,6 +204,34 @@ def getRandomUsername(directory):
     r = random.randint(0, len(list_of_files)-1)
     return list_of_files[r]
 
+
+# Returns a random playlist
+# restriction should be a function that operates on a playlist to figure out if it should be added or not
+# example:
+# def publicPlaylist(playlist):
+#     return playlist['public'] is True and len(playlist['tracks']['items']) > 2
+# getRandomPlaylist(....., publicPlaylist)
+def getRandomPlaylist(directory, type, restriction):
+    if not os.path.exists(directory):
+        return False
+
+    list_of_files = glob.glob(directory+"/**/"+type+".json", recursive=True)
+    if len(list_of_files) == 0:
+        return None
+
+    all = []
+
+    for file in list_of_files:
+        with open(file, "r") as f:
+            data = json.load(f)
+            for one in data:
+                if restriction(one):
+                    all.append(one)
+
+    r = random.randint(0, len(all) - 1)
+
+
+    return all[r]
 
 
 def loadRandomLibrary(directory):
