@@ -498,6 +498,12 @@ def getRandomPlaylist():
 
     playlist = analyze.getRandomPlaylist(DATA_DIRECTORY, 'playlists-tracks', publicPlaylist)
 
+    if playlist is None:
+        return render_template('dataload.html', sortedA=None,
+                               subheader_message="",
+                               library={},
+                               **session)
+
     #while playlists is None or len(playlists)==0:
     #    playlists = analyze.getRandom(DATA_DIRECTORY, 'playlists-tracks')
 
@@ -512,6 +518,7 @@ def getRandomPlaylist():
     #for playlist in playlists:
     #    if playlist['public'] is True:
     #print(' playlist is public ' +playlist['name']+ ' owner:'+playlist['owner']['display_name'])
+
 
     playlistName = playlist['name']
     subheader_message = "Playlist '" + playlistName+"'"
