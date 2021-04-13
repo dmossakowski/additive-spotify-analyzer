@@ -511,7 +511,7 @@ def getRandomPlaylist():
 
     #for playlist in playlists:
     #    if playlist['public'] is True:
-    print(' playlist is public ' +playlist['name']+ ' owner:'+playlist['owner']['display_name'])
+    #print(' playlist is public ' +playlist['name']+ ' owner:'+playlist['owner']['display_name'])
 
     playlistName = playlist['name']
     subheader_message = "Playlist '" + playlistName+"'"

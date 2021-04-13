@@ -215,9 +215,14 @@ def getRandomPlaylist(directory, type, restriction):
     if not os.path.exists(directory):
         return False
 
+    # get starting time
+    start = datetime.now()
+
     list_of_files = glob.glob(directory+"/**/"+type+".json", recursive=True)
     if len(list_of_files) == 0:
         return None
+
+    elapsed_time1 = (datetime.now() - start)
 
     all = []
 
@@ -229,8 +234,9 @@ def getRandomPlaylist(directory, type, restriction):
                     all.append(one)
 
     r = random.randint(0, len(all) - 1)
+    elapsed_time2 = (datetime.now() - start)
 
-
+    print ('random playlist '+str(elapsed_time1)+' - '+str(elapsed_time2))
     return all[r]
 
 
