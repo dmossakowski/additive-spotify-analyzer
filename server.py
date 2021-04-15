@@ -748,7 +748,7 @@ def _retrieveSpotifyData(session):
     print("retrieving audio_features...")
     #_setUserSessionMsg("Loading audio features..." )
     library['audio_features'] = getAudioFeatures(library['tracks'], file_path)
-    _setUserSessionMsg("All data loaded <br>"+analyze.getLibrarySize(library))
+
 
     print("retrieving playlists...")
     # _setUserSessionMsg("Top artists loaded. Loading playlists..." + analyze.getLibrarySize(library))
@@ -760,6 +760,7 @@ def _retrieveSpotifyData(session):
     # in the end we will have all playlists with their tracks for the user
     library['playlists'] = getPlaylistTracks(library['playlists'], file_path)
 
+    _setUserSessionMsg("All data loaded <br>" + analyze.getLibrarySize(library))
     print("All data downloaded "+analyze.getLibrarySize(library))
     return library
 
@@ -991,7 +992,7 @@ def getPlaylistTracks(playlists, file_path='data/'):
             print('skipping playlist which has no tracks ' + str(name))
             continue
 
-        if featureBatchTracks.get('next') is not None:
+        if featureBatchTracks.get('next') is not None and len(featureBatch['tracks']['items']) < 80:
             next = featureBatch['tracks']['next']
             while next is not None:
                 featureBatch2 = retrieveAudioFeatures(next, auth_header)
@@ -1003,6 +1004,7 @@ def getPlaylistTracks(playlists, file_path='data/'):
         #lastFeatureBatch = featureBatch
         #tracks += featureBatch
         _setUserSessionMsg('Loading playlists... ' + str(len(playlistsWithTracks)) + '/' + str(len(playlists)))
+        #print (" size "+str(len(featureBatch['tracks']['items'])))
         #limit = 100
         #ids.clear()
         playlistsWithTracks.append(featureBatch)
