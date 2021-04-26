@@ -215,12 +215,15 @@ def getRandomUsername(directory):
 # getRandomPlaylist(....., publicPlaylist)
 def getRandomPlaylist(directory, type, restriction):
     if not os.path.exists(directory):
-        return False
+        return None
 
     publicPlaylistFile = directory+processedDataDir+"/public-playlists.json"
+    createdPublicPlaylistFile = None
     if not os.path.exists(publicPlaylistFile):
-        generatePublicPlaylistsFile(directory,publicPlaylistFile, type, restriction)
+        createdPublicPlaylistFile = generatePublicPlaylistsFile(directory,publicPlaylistFile, type, restriction)
 
+    if createdPublicPlaylistFile is None:
+        return None
     # get starting time
     start = datetime.now()
 
@@ -239,6 +242,7 @@ def getRandomPlaylist(directory, type, restriction):
 def generatePublicPlaylistsFile(directory,publicPlaylistFile, type, restriction):
     if not os.path.exists(directory + processedDataDir):
         os.mkdir(directory + processedDataDir)
+        print('directory does not exist so create ' +directory+processedDataDir)
     # get starting time
     start = datetime.now()
 
@@ -263,6 +267,7 @@ def generatePublicPlaylistsFile(directory,publicPlaylistFile, type, restriction)
 
     elapsed_time1 = (datetime.now() - start)
     print('generated public playlist file ' + str(elapsed_time1) )
+    return elapsed_time1
 
 
 def loadRandomLibrary(directory):
