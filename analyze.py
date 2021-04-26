@@ -218,12 +218,11 @@ def getRandomPlaylist(directory, type, restriction):
         return None
 
     publicPlaylistFile = directory+processedDataDir+"/public-playlists.json"
-    createdPublicPlaylistFile = None
-    if not os.path.exists(publicPlaylistFile):
-        createdPublicPlaylistFile = generatePublicPlaylistsFile(directory,publicPlaylistFile, type, restriction)
 
-    if createdPublicPlaylistFile is None:
-        return None
+    if not os.path.exists(publicPlaylistFile):
+        if generatePublicPlaylistsFile(directory,publicPlaylistFile, type, restriction) is None:
+            return None
+
     # get starting time
     start = datetime.now()
 
