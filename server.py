@@ -849,7 +849,7 @@ def saveData(file_path, itemtype, time_range, d):
         time_range = "_"+time_range
 
     with (open(file_path+'/'+str(itemtype)+str(time_range)+'.json', "w")) as outfile:
-        json.dump(d, outfile, indent=4)
+        json.dump(d, outfile, indent=0)
 
 
 @app.route('/audio_features')
@@ -1146,5 +1146,5 @@ def blog():
 
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', threaded=True, debug=True)
+    app.run(host='localhost', threaded=True, debug=True, ssl_context=('cert.pem', 'key.pem'))
 

@@ -23,6 +23,8 @@ from matplotlib.figure import Figure
 from sklearn.preprocessing import MinMaxScaler
 
 
+processedDataDir = "/additivespotifyanalyzer"
+
 def getEmptyLibrary():
     library = {}
     library['tracks'] = []
@@ -215,14 +217,37 @@ def getRandomPlaylist(directory, type, restriction):
     if not os.path.exists(directory):
         return False
 
+    publicPlaylistFile = directory+processedDataDir+"/public-playlists.json"
+    if not os.path.exists(publicPlaylistFile):
+        generatePublicPlaylistsFile(directory,publicPlaylistFile, type, restriction)
+
     # get starting time
     start = datetime.now()
+
+    data = []
+    with open(publicPlaylistFile, "r") as filedata:
+        data = json.load(filedata)
+    elapsed_time1 = (datetime.now() - start)
+
+    r = random.randint(0, len(data) - 1)
+    elapsed_time2 = (datetime.now() - start)
+
+    print ('random playlist '+str(elapsed_time1)+' - '+str(elapsed_time2))
+    return data[r]
+
+
+def generatePublicPlaylistsFile(directory,publicPlaylistFile, type, restriction):
+    if not os.path.exists(directory + processedDataDir):
+        os.mkdir(directory + processedDataDir)
+    # get starting time
+    start = datetime.now()
+
+    if os.path.exists(publicPlaylistFile):
+        os.remove(publicPlaylistFile)
 
     list_of_files = glob.glob(directory+"/**/"+type+".json", recursive=True)
     if len(list_of_files) == 0:
         return None
-
-    elapsed_time1 = (datetime.now() - start)
 
     all = []
 
@@ -233,11 +258,11 @@ def getRandomPlaylist(directory, type, restriction):
                 if restriction(one):
                     all.append(one)
 
-    r = random.randint(0, len(all) - 1)
-    elapsed_time2 = (datetime.now() - start)
+    with (open(publicPlaylistFile, "w")) as outfile:
+        json.dump(all, outfile, indent=0)
 
-    print ('random playlist '+str(elapsed_time1)+' - '+str(elapsed_time2))
-    return all[r]
+    elapsed_time1 = (datetime.now() - start)
+    print('generated public playlist file ' + str(elapsed_time1) )
 
 
 def loadRandomLibrary(directory):

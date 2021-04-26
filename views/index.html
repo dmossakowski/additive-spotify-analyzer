@@ -54,6 +54,8 @@
 
 				{% endif %}
 
+
+
 	<div style="text-align: left;">This site is a collection of various types of analysis on your Spotify data and a test bed
 		for learning Python and data analysis.
 
@@ -67,6 +69,9 @@
 
 		<i>Your data was last updated: {{ lastmodified }}</i><br><br>
 	{% endif %}
+
+
+<div id="fblikebutton"  class="fb-like" data-href="https://www.facebook.com/AdditiveSpotifyAnalyzer" data-width="" data-layout="button" data-action="like" data-size="small" data-share="true"></div>
 
 
 <div style="text-align: center;">
@@ -103,12 +108,14 @@
 
 	<!--h4><a href="/datadownload">Update all Spotify data</a></li></h4-->
 
+						{% if plot is defined and plot %}
     <div class="chart" id="bargraph">
     <script>
         var graphs = {{plot | safe}};
         Plotly.plot('bargraph',graphs,{});
     </script>
     </div>
+						{% endif %}
 </div>
 				</div>
 {% endblock %}
