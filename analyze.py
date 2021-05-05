@@ -22,8 +22,14 @@ from collections import defaultdict
 from matplotlib.figure import Figure
 from sklearn.preprocessing import MinMaxScaler
 
+from functools import lru_cache
 
 processedDataDir = "/additivespotifyanalyzer"
+
+def cache_clear():
+    loadAudioFeatures.cache_clear()
+    loadLibraryFromFiles.cache_clear()
+    getOrGeneratePublicPlaylistsFile.cache_clear()
 
 def getEmptyLibrary():
     library = {}
@@ -121,7 +127,7 @@ def isLibraryValid(directory=None):
 
     return True
 
-
+@lru_cache(maxsize = 128)
 def loadLibraryFromFiles(directory=None):
     library = {}
 
@@ -219,16 +225,14 @@ def getRandomPlaylist(directory, type, restriction):
 
     publicPlaylistFile = directory+processedDataDir+"/public-playlists.json"
 
-    if not os.path.exists(publicPlaylistFile):
-        if generatePublicPlaylistsFile(directory,publicPlaylistFile, type, restriction) is None:
-            return None
+    data = getOrGeneratePublicPlaylistsFile(directory,publicPlaylistFile, type, restriction)
+
+    if data is None:
+        return None
 
     # get starting time
     start = datetime.now()
 
-    data = []
-    with open(publicPlaylistFile, "r") as filedata:
-        data = json.load(filedata)
     elapsed_time1 = (datetime.now() - start)
 
     r = random.randint(0, len(data) - 1)
@@ -238,7 +242,8 @@ def getRandomPlaylist(directory, type, restriction):
     return data[r]
 
 
-def generatePublicPlaylistsFile(directory,publicPlaylistFile, type, restriction):
+@lru_cache(maxsize=128)
+def getOrGeneratePublicPlaylistsFile(directory,publicPlaylistFile, type, restriction):
     if not os.path.exists(directory + processedDataDir):
         os.mkdir(directory + processedDataDir)
         print('directory does not exist so create ' +directory+processedDataDir)
@@ -266,7 +271,9 @@ def generatePublicPlaylistsFile(directory,publicPlaylistFile, type, restriction)
 
     elapsed_time1 = (datetime.now() - start)
     print('generated public playlist file ' + str(elapsed_time1) )
-    return elapsed_time1
+
+    return all
+    #return elapsed_time1
 
 
 def loadRandomLibrary(directory):
@@ -283,6 +290,7 @@ def getRandomPlaylistName(directory):
     return randomPlaylist['name']
 
 
+@lru_cache(maxsize = 128)
 def loadAudioFeatures(path="data/"):
     try:
         with (open(path+'audio_features.json', "r")) as f:

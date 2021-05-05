@@ -473,10 +473,33 @@ def getPublicPlaylistDashboard():
 def publicPlaylist(playlist):
     return playlist['public'] is True and len(playlist['tracks']['items']) > 2
 
-@app.route('/randomPlaylist')
+
+
+
+
+@app.route('/randomPlaylistGet')
 #@login_required
 def getRandomPlaylist():
 
+    playlistName = request.args.get('playlistName')
+    #playlist = request.args.get('playlist')
+    playlist = session.get('playlist')
+    playlist = json.loads(playlist)
+    subheader_message = "Playlist '" + playlistName + "'"
+
+    return render_template("randomPlaylist.html", playlistName=playlistName, playlist=playlist,
+                           subheader_message=subheader_message,
+                           library=None,
+                           **session)
+
+
+@app.route('/randomPlaylist')
+#@login_required
+def getRandomPlaylist1():
+
+    username = request.args.get('username')
+
+    r = request
     #username = request.args.get('username')
 
     #if username is None:
@@ -521,13 +544,20 @@ def getRandomPlaylist():
 
 
     playlistName = playlist['name']
-    subheader_message = "Playlist '" + playlistName+"'"
 
+    subheader_message = "Playlist '" + playlistName + "'"
 
     #library= {}
     #library['tracks'] = tracks
+    #playlist = json.dumps(playlist)
+    u = url_for('getRandomPlaylist', playlistName=playlistName, playlist=playlist,
+                           subheader_message=subheader_message)
+    #return redirect(url_for('getRandomPlaylist', playlistName=playlistName, playlist=playlist,
+    #                       subheader_message=subheader_message,
+    #                       library=None,
+    #                       **session))
 
-    return render_template('randomPlaylist.html', playlistName=playlistName, playlist=playlist,
+    return render_template("randomPlaylist.html", playlistName=playlistName, playlist=playlist,
                            subheader_message=subheader_message,
                            library=None,
                             **session)
@@ -762,6 +792,11 @@ def _retrieveSpotifyData(session):
 
     _setUserSessionMsg("All data loaded <br>" + analyze.getLibrarySize(library))
     print("All data downloaded "+analyze.getLibrarySize(library))
+
+    #expire cache in analyze to force reload files from disk
+    analyze.cache_clear()
+    saagraph.cache_clear()
+
     return library
 
 
@@ -1071,8 +1106,6 @@ def analyzeLocal():
 @login_required
 def getFavoriteArtistsOverTime(file_path='data/'):
     #print ("retrieving audio features...")
-
-    library = analyze.loadRandomLibrary(DATA_DIRECTORY)
 
     library = analyze.loadLibraryFromFiles(_getDataPath())
 
